@@ -1,0 +1,35 @@
+\documentclass{article}
+\usepackage[code, figure, table, outputdir=build]{common}
+\usepackage{menukeys}
+\newcommand{\icon}[1]{\resizebox{0.75em}{!}{\includegraphics{images/icons/#1.png}}}
+% change default float placement
+\makeatletter
+\renewcommand*{\fps@figure}{!htbp}
+\makeatother
+% ensure floats are printed before subsection & subsubsection
+\usepackage[section]{placeins}
+\makeatletter
+\AtBeginDocument{%
+  \expandafter\renewcommand\expandafter\subsection\expandafter{%
+    \expandafter\@fb@secFB\subsection
+  }%
+  \expandafter\renewcommand\expandafter\subsubsection\expandafter{%
+    \expandafter\@fb@secFB\subsubsection
+  }%
+}
+\makeatother
+
+\title{Introduction to Computer Networks}
+\author{Yubo Cao \& Anish Goyal}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+\tableofcontents
+\newpage
+
+\include{soft_install.tex}
+
+
+\end{document}
