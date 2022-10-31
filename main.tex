@@ -1,5 +1,7 @@
 \documentclass{article}
-\usepackage[code, figure, table, outputdir=build]{common}
+\usepackage[code, figure, table, outputdir=build, tikz]{common}
+\usetikzlibrary{chains}
+
 \usepackage{menukeys}
 \newcommand{\icon}[1]{\resizebox{0.75em}{!}{\includegraphics{images/icons/#1.png}}}
 % change default float placement
@@ -29,7 +31,7 @@
 \tableofcontents
 \newpage
 
-\include{soft_install.tex}
-
+% \include{soft_install.tex}
+\include{arp.tex}
 
 \end{document}

@@ -5,5 +5,6 @@
             "scheme": "file",
             "pattern": "soft_install.tex"
         }
-    ]
+    ],
+    "latex-workshop.latex.autoBuild.run": "onSave"
 }
