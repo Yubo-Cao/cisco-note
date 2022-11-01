@@ -1,0 +1,297 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{common}[2022/10/15 Common Package Loader of LaTeX]
+
+% conditions to load package groups of document
+\RequirePackage{etoolbox}
+\newbool{tikz}
+\newbool{figure}
+\newbool{table}
+\newbool{code}
+\newbool{bib}
+\newcommand{\defaultPL}{python}
+\newbool{unit}
+\newbool{math}
+\newbool{chem}
+\newbool{qa}
+\newbool{boxedAnswer}
+\newbool{boxedQuestion}
+\newbool{numberedQuestion}
+\newbool{numberedAnswer}
+
+% parse package options
+\RequirePackage{xkeyval}
+\RequirePackage{xkvltxp}
+\RequirePackage{ifthen}
+\RequirePackage{expl3}
+\RequirePackage{xparse}
+
+% bool if
+\newcommand{\@booloption}[2]{
+    \ifstrequal{#1}{true}{
+        \booltrue{#2}
+    }{
+        \ifstrequal{#1}{false}{
+            \boolfalse{#2}
+        }{
+            \PackageError{common}{#1 for #2 is not a valid option}
+        }
+    }
+}
+% bool to str
+\newcommand{\@booltostr}[1]{
+    \ifbool{#1}{
+        true
+    }{
+        false
+    }
+}
+% for each bool, define a key
+\DeclareOptionX{tikz}[true]{\@booloption{#1}{tikz}}
+\DeclareOptionX{figure}[true]{\@booloption{#1}{figure}}
+\DeclareOptionX{table}[true]{\@booloption{#1}{table}}
+\DeclareOptionX{code}[true]{\@booloption{#1}{code}}
+\DeclareOptionX{bib}[true]{\@booloption{#1}{bib}}
+\DeclareOptionX{unit}[true]{\@booloption{#1}{unit}}
+\DeclareOptionX{math}[true]{\@booloption{#1}{math}}
+\DeclareOptionX{chem}[true]{\@booloption{#1}{chem}}
+\DeclareOptionX{qa}[true]{\@booloption{#1}{qa}}
+\DeclareOptionX{boxedAnswer}[true]{\@booloption{#1}{boxedAnswer}}
+\DeclareOptionX{boxedQuestion}[true]{\@booloption{#1}{boxedQuestion}}
+\DeclareOptionX{numberedQuestion}[true]{\@booloption{#1}{numberedQuestion}}
+\DeclareOptionX{numberedAnswer}[true]{\@booloption{#1}{numberedAnswer}}
+% now for programming language
+\DeclareOptionX{pl}{\def\defaultPL{#1}}
+\DeclareOptionX{python}{\def\defaultPL{python}}
+\DeclareOptionX{c}{\def\defaultPL{c}}
+\DeclareOptionX{java}{\def\defaultPL{java}}
+\def\defaultPL{python}
+% line space
+\DeclareOptionX{linespace}{\def\linespace{#1}}
+\def\linespace{1.15}
+% outputdir
+\DeclareOptionX{outputdir}{\def\outputdir{#1}}
+
+\ProcessOptionsX
+
+% ==================== Common ====================
+% theme color
+% ------------------------------
+\RequirePackage{xcolor}
+% #06283D
+\definecolor{theme-1}{RGB}{6,40,61}
+% #1363DF
+\definecolor{theme-2}{RGB}{19,99,223}
+% #47B5FF
+\definecolor{theme-3}{RGB}{71,181,255}
+% #DFF6FF
+\definecolor{theme-4}{RGB}{223,246,255}
+% #FFFFFF
+\definecolor{background}{RGB}{255,255,255}
+% ------------------------------
+
+% highlight color
+% ------------------------------
+\RequirePackage{soul}
+\sethlcolor{theme-2}
+\renewcommand{\underline}[1]{\ul{#1}}
+% ------------------------------
+
+% references
+% ------------------------------
+\RequirePackage[hidelinks]{hyperref}
+\providecommand*{\listingautorefname}{Listing}
+% ------------------------------
+
+% set linespacing
+% ------------------------------
+\RequirePackage{setspace}
+\setstretch{\linespace}
+% ------------------------------
+
+% microtype
+% ------------------------------
+\RequirePackage{microtype}
+% ------------------------------
+
+% list
+% ------------------------------
+\RequirePackage{enumitem}
+% ------------------------------
+
+% ==================== Floats ====================
+% figure
+% ------------------------------
+\iffigure
+    \RequirePackage{graphicx}
+    \RequirePackage{wrapfig}
+    \RequirePackage{subcaption}
+    \RequirePackage{float}
+\fi
+% ------------------------------
+
+% tikz & plot
+% ------------------------------
+\iftikz
+    \RequirePackage{tikz}
+    \usetikzlibrary{arrows.meta, calc, positioning}
+    \RequirePackage{pgfplots}
+    \pgfplotsset{compat=1.18}
+\fi
+% ------------------------------
+
+% table
+% ------------------------------
+\iftable
+    \RequirePackage{booktabs}
+    \RequirePackage{multirow}
+    \RequirePackage{longtable}
+    \RequirePackage{xltabular}
+    \RequirePackage{array}
+\fi
+% ------------------------------
+
+% ==================== Common Science ====================
+% science --- cs/code
+% ------------------------------
+\ifcode
+    \RequirePackage{fontspec}
+
+    \ifdefined\outputdir
+        \RequirePackage[outputdir=\outputdir]{minted}
+    \else
+        \RequirePackage{minted}
+    \fi
+    \setminted{fontsize=\footnotesize,linenos,frame=lines,autogobble,breakanywhere,tabsize=4,breaklines}
+    \newmintinline[mono]{\defaultPL}{fontsize=\small}
+    \newminted[monos]{\defaultPL}{}
+    \RequirePackage[ruled]{algorithm2e}
+    \iftable%
+        \newcolumntype{C}{>{\ttfamily\arraybackslash}p}
+    \fi
+\fi
+% ------------------------------
+
+% science --- unit
+% ------------------------------
+\ifunit
+    \RequirePackage{siunitx}
+    \DeclareSIUnit\inch{in}
+    \DeclareSIUnit\foot{ft}
+    \DeclareSIUnit\pound{lb}
+    \DeclareSIUnit\degree{^\circ}
+\fi
+% ------------------------------
+
+% science --- chemistry
+% ------------------------------
+\ifchem
+    \RequirePackage[version=4]{mhchem}
+    \RequirePackage{chemfig}
+\fi
+% ------------------------------
+
+% science --- math
+% ------------------------------
+\ifmath
+    \RequirePackage{amsmath}
+    \RequirePackage{amssymb}
+    \RequirePackage{amsthm}
+\fi
+% ------------------------------
+
+% ==================== Common School ====================
+% school --- question and answer
+% ------------------------------
+
+
+\ExplSyntaxOn
+\NewExpandableDocumentCommand{\@ifDark}{mmm}
+{
+    \if_dark:eTF { #1 } {#2} {#3}
+}
+\NewExpandableDocumentCommand{\@autoTextColor}{m}
+{
+    \@ifDark{#1}{\color{white}}{\color{black}}
+}
+\fp_new:N \l_bright_fp
+\prg_new_conditional:Nnn \if_dark:n {p,T,F,TF}
+    {
+        \convertcolorspec{named}{#1}{gray}\gray
+        \fp_set:Nn \l_bright_fp { \gray }
+        \fp_compare:nTF { \l_bright_fp  <  0.5 } 
+            { \prg_return_true: }
+            { \prg_return_false: }
+    }
+\prg_generate_conditional_variant:Nnn \if_dark:n {e} {p,T,F,TF}
+\ExplSyntaxOff
+
+\ifqa
+    \RequirePackage[most]{tcolorbox}
+    \newcommand{\@colonify}[2]{\ifthenelse{\equal{#2}{}}{\textbf{#1}\par}{\textbf{#1:} #2}}
+
+    \define@boolkey{question}[true]{boxed}{\def\q@boxed{#1}}
+    \define@boolkey{answer}[true]{boxed}{\def\a@boxed{#1}}
+    \define@boolkey{question}[true]{numbered}{\def\q@numbered{#1}}
+    \define@boolkey{answer}[true]{numbered}{\def\a@numbered{#1}}
+    \define@key{question}{title}{\def\q@title{#1}}
+    \define@key{answer}{title}{\def\a@title{#1}}
+
+    \newcommand{\@setdefault}{
+        \ifboxedQuestion \def\q@boxed{true} \else \def\q@boxed{false} \fi
+        \ifboxedAnswer \def\a@boxed{true} \else \def\a@boxed{false} \fi
+        \ifnumberedQuestion \def\q@numbered{true} \else \def\q@numbered{false} \fi
+        \ifnumberedAnswer \def\a@numbered{true} \else \def\a@numbered{false} \fi
+        \def \q@title{}
+        \def \a@title{}
+    }
+    
+    \newcounter{question}
+    \newcounter{answer}
+
+    \newenvironment{question}[1][]{
+        \@setdefault
+        \setkeys{question}{#1}
+        % answer number within question
+        \setcounter{answer}{0}
+
+        \ifthenelse{\equal{\q@numbered}{true}}{
+            \stepcounter{question}
+            \def\q@t{\@colonify{Question \arabic{question}{\q@title}}}
+        }{
+            \def\q@t{\@colonify{Question}{\q@title}}
+        }
+
+        \ifthenelse{\equal{\q@boxed}{true}}{
+            \begin{tcolorbox}[enhanced,sharp corners,boxrule=0.4pt,colback=background,colframe=theme-2,colbacktitle=theme-2,fonttitle=\bfseries\@autoTextColor{theme-2},title=\q@t]
+        }{ \q@t }
+    }{
+        \ifthenelse{\equal{\q@boxed}{true}}{ \end{tcolorbox} }{}
+    }
+    \newenvironment{answer}[1][]{
+        \@setdefault
+        \setkeys{answer}{#1}
+
+        \ifthenelse{\equal{\a@numbered}{true}}{
+            \stepcounter{answer}
+            \def\a@t{\@colonify{Answer \arabic{answer}{\a@title}}}
+        }{
+            \def\a@t{\@colonify{Answer}{\a@title}}
+        }
+
+        \ifthenelse{\equal{\a@boxed}{true}}{
+            \begin{tcolorbox}[enhanced,sharp corners,boxrule=0.4pt,colback=background,colframe=theme-4,colbacktitle=theme-4,fonttitle=\bfseries\@autoTextColor{theme-4},title=\a@t]
+        }{ \a@t }
+    }{
+        \ifthenelse{\equal{\a@boxed}{true}}{ \end{tcolorbox} }{}
+    }
+\fi
+
+% ------------------------------
+
+% school --- bibliography(apa)
+% ------------------------------
+\ifbib
+    \RequirePackage[style=apa,backend=biber,sorting=none,doi=false,isbn=false,url=false,hyperref=false]{biblatex}
+    \addbibresource{cite.bib}
+\fi
+% ------------------------------
